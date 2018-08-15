@@ -64,14 +64,15 @@ LogFil=StartRDexomeCNV.$$.log
 # Check input, number of samples to be run
 NoSamples=`wc -l $InpFil | cut -f1 -d" "`
 NoCol=`awk '{print NF}' $InpFil | head -n1`
+NoJobs=$NoJobs
 
 echo "Number of samples is "$NoSamples
 echo "Input list has "$NoCol" columns"
 echo $COV_DIR
 
 if [[ $NoCol == 2 ]]; then
-	StepNam="Starting CNV pipeline for $InpFil with 10 parallel jobs, using $RefFil as reference"
-	StepCmd="seq 1 $NoSamples | parallel -j 10 --eta --joblog RD_calculator_parallel.$$.log sh $COV_DIR/Run_RD_calculator.sh -i $SAMPLE_INFO_DIR/$InpFil -r $RefFil -l $LogFile -a {}"
+	StepNam="Starting CNV pipeline for $InpFil with $NoJobs parallel jobs, using $RefFil as reference"
+	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel.$$.log sh $COV_DIR/Run_RD_calculator.sh -i $SAMPLE_INFO_DIR/$InpFil -r $RefFil -l $LogFile -a {}"
 	if [[ $Pipeline == "true" ]]; then StepCmd=$StepCmd" -P"; fi
 	echo $StepNam >> $LogFil
 	echo "~~~~" >> $LogFil

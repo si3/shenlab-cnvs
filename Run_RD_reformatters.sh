@@ -77,6 +77,7 @@ StepNam="Converting bedtools to CANOES"
 StepCmd="bash Run_bedtools_to_CANOES.sh $InpFil $WindFil"
 funcRunStep
 
+NextJob= # Runs CANOES R scripts
 funcRunPipeline
 
 # Secondly run mosdepth_to_XHMM, initiate XHMM pipeline if -P
@@ -84,17 +85,19 @@ StepNam="Converting mosdepth to XHMM"
 StepCmd="bash Run_mosdepth_to_XHMM.sh $InpFil $WindFil"
 funcRunStep
 
-NextJob=
-NextCmd=
+wait
+
+NextJob="Calling CNVs using XHMM"
+NextCmd="bash Run_XHMM.sh"
 funcRunPipeline
 
 # Thirdly run CLAMMS_normalizer, continue pipeline if -P
-StepNam="Starting CLAMMS workflow by normalizing in parallel $NoJobs samples at a time"
-StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_normalizer_parallel.$$.log sh $COV_DIR/Run.CLAMMS_normalizer.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
-funcRunStep
-
-NextJob=
-NextCmd=
+NextJob="Starting CLAMMS workflow by normalizing in parallel $NoJobs samples at a time"
+NextCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_normalizer_parallel.$$.log sh $COV_DIR/Run.CLAMMS_normalizer.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
+if [[ $Pipeline == "true" ]]; then
+	NextCmd=$NextCmd" -P"
+else
+	NextCmd=$NextCmd
+fi
 funcRunPipeline
 funcWriteEndLog
-
