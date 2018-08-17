@@ -1,12 +1,29 @@
 #!/bin/bash
 
-# this script will format target BED file (targets.bed) according to CLAMMS reqs
-# Large intervals (e.g. > 1000bp) will be broken down into ~500bp windows
-# Information about 
+# This script will reformat target BED file to a CLAMMS windows BED file
+# Large intervals will be broken down into ~500bp windows
+# Script needs the following files, do not use "." in identifier:
+
+# $1 variable - (required) path to BED file with targets (TgtFil)
+# $2 variable - (required) path to REF shell file (RefFil)
+
+# Script needs to be in COV_DIR (same intended directory as output from bedtools)
+# Information imported from RefFil include the following:
+
+# Mappability.bed 
+# CLAMMS special regions
+# Insert size
+# Reference fasta
+
+# Information about mappability and sequence complexity will be included in windows.bed
+# All files need to have matching chormosome names and order (no "chr")
+# Sort them with bedtools sort prior to running script
+
 #	- mappability from UCSC wig file with appropriate read length (mappability.bed)
 # 	- reference fasta (genome.fa)
 #	- CLAMMS special regions (clamms_special_regions.bed)
 #	- insert size
+
 # Will also be included as metadata. Sort all bed files with bedtools sort or sort -k1,1 -k2,2n
 # chmod +x any CLAMMS scripts
 # Run this for each capture kit separately
@@ -20,9 +37,12 @@ INSERT_SIZE=250 # average insert size for batch
 #targets.bed
 #mappability.be
 
+WIND=`basename $1 | cut -f1 -d"."`
 
-INSERT_SIZE=250
-$CLAMMS_DIR/annotate_windows.sh $RES_DIR/$1.targets.bed $RES_DIR/hg19.fasta $RES_DIR/mappability.75mer.clamms.sorted.bed $INSERT_SIZE $CLAMMS_DIR/data/clamms_special_regions.grch38.bed > $RES_DIR/$1.250bp.windows.bed
+RefFil=`readlink -f $2`
+source $RefFil
+
+$CLAMMS_DIR/annotate_windows.sh $RES_DIR/$TgtFil $RES_DIR/hg19.fasta $RES_DIR/mappability.75mer.clamms.sorted.bed $INSERT_SIZE $CLAMMS_DIR/data/clamms_special_regions.grch38.bed > $RES_DIR/$1.250bp.windows.bed
 
 # $CLAMMS_DIR/annotate_windows.sh $1.sorted.targets.bed hg19.clamms.fasta mappability.75mer.clamms.sorted.bed $INSERT_SIZE $CLAMMS_DIR/data/clamms_special_regions.grch38.bed > $1.windows.bed
 

@@ -63,15 +63,17 @@ done
 
 if [[ ! -e "$InpFil" ]] || [[ ! -e "$RefFil" ]]; then echo "Missing/Incorrect required arguments"; echo "$usage"; exit; fi
 
-# Call the RefFil to load variables, set other variables
+# Call the RefFil to load variables
 RefFil=`readlink -f $RefFil`
 source $RefFil
 
+# Set all variables
 InpFil=`readlink -f $InpFil`
 NoSamples=`wc -l $InpFil | cut -f1 -d" "`
 BamFil=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 1)
 BamNam=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 2)
-
+WindFil=`readlink -f $WindFil`
+LogFil=`readlink -f $LogFil`
 
 TmpLog="RD_calculator_"$LogFil
 
@@ -88,17 +90,16 @@ fi
 #StepNam="Running dummy test"
 #StepCmd="echo $BamNam >> $PROJ_DIR/dummy.test"
 
-StepNam="Running mosdepth for $BamNam"
-StepCmd="mosdepth --by $RES_DIR/$WindFil $BamNam $BamFil -Q $Min_MQ"
+StepNam="Running mosdepth for "$BamNam
+StepCmd="mosdepth --by $WindFil $BamNam $BamFil -Q $Min_MQ"
 funcRunStep
 
-StepNam="Running bedtools for $BamNam"
-StepCmd="bedtools multicov -bams $BamFil -bed $RES_DIR/$WindFil -q $Min_MQ | awk '{print $1, $2, $3, $NF, $NF/($3-$2)}' > $COV_DIR/$BamNam.coverage.bed"
+StepNam="Running bedtools for "$BamNam
+StepCmd="bedtools multicov -bams $BamFil -bed $WindFil -q $Min_MQ | awk '{print $1, $2, $3, $NF, $NF/($3-$2)}' > $COV_DIR/$BamNam.coverage.bed"
 funcRunStep
 
 if [[ $ArrNum == $NoSamples ]]; then # Checks end job, does housekeeping
 	echo "Parallel is done" >> $TmpLog
-	funcWriteEndLog
 	mkdir mosdepth
 	mkdir bedtools
 	mv *.regions.bed.gz ./mosdepth
@@ -107,12 +108,15 @@ if [[ $ArrNum == $NoSamples ]]; then # Checks end job, does housekeeping
 	mv *.per-base.bed.gz.csi ./mosdepth
 	mv *.mosdepth.global.dist.txt ./mosdepth
 	mv *.coverage.bed ./bedtools 
-	NextJob=
-	NextCmd=
-	funcPipeline #checks if P is flagged automatically and writes to TmpLog
+	echo "Directories mosdepth and bedtools created in "$COV_DIR >> $TmpLog
+	if [[ $Pipeline == "true" ]]; then  
+		NextJob="Run mosdepth and bedtools reformatter scripts"
+		NextCmd="bash Run_RD_reformatters.sh -P"
+		funcPipeline #checks if P is flagged automatically and writes to TmpLog
+	fi
 	funcWriteEndLog
 else
-	echo "Parallel was working on sample number $ArrNum" >> $TmpLog
+	echo "Parallel was working on sample number "$ArrNum >> $TmpLog
 fi
 
 	
