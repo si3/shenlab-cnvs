@@ -2,6 +2,7 @@
 
 # This script takes output from mosdepth and bedtools and converts it into input for CANOES, XHMM, CLAMMS
 # Calls subscripts that need to be in COV_DIR (same as output from mosdepth and bedtools)
+# If P="true" then it will also call XHMM and CLAMMS (support for CANOES pending)
 
 # InpFil - (required) path to bam file or bam list
 # RefFil - (required) shell file containing resources for this batch run
@@ -26,7 +27,7 @@ usage="
 	-r (required) path/to/cnv.exome.references.sh
 	-l (optional) path/to/log
 	-t (optional) path/to/targets.bed
-	-P (flag) calls next step in pipeline
+	-P (flag) invokes XHMM and CLAMMS after reformatting
 	-H (flag) echo this message
 
 	Usage: bash Run_RD_reformatters.sh -i InpFil -r RefFil
@@ -77,8 +78,9 @@ StepNam="Converting bedtools to CANOES"
 StepCmd="bash Run_bedtools_to_CANOES.sh $InpFil $WindFil"
 funcRunStep
 
-NextJob= # Runs CANOES R scripts
-funcRunPipeline
+# NextJob= 
+# Runs CANOES R scripts
+# funcRunPipeline
 
 # Secondly run mosdepth_to_XHMM, initiate XHMM pipeline if -P
 StepNam="Converting mosdepth to XHMM"

@@ -30,7 +30,7 @@ usage="
 	-P (flag) initiates pipeline
 	-H (flag) echo this message
 
-	Usage: bash Run_pipeline_initiator.sh -i path/to/bam -r path/to/ref -l -t path/to/log -P
+	Usage: bash Run_pipeline_initiator.sh -i path/to/bam -r path/to/ref -l path/to/log -P
 
 "
 
@@ -58,25 +58,31 @@ InpFil=`readlink -f $InpFil`
 #BamNam=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 2)
 
 
-# Start log file
-LogFil=StartRDexomeCNV.$$.log
+# Create log file unless specified
+if [[ -z "$LogFil" ]]; then
+	LogFil=StartRDexomeCNV.$$.log
+else
+	LogFil=`readlink -f $LogFil`
+fi
 
 # Check input, number of samples to be run
 NoSamples=`wc -l $InpFil | cut -f1 -d" "`
 NoCol=`awk '{print NF}' $InpFil | head -n1`
 NoJobs=$NoJobs
 
-echo "Number of samples is "$NoSamples
-echo "Input list has "$NoCol" columns"
-echo $COV_DIR
+echo "Welcome to CNV calling pipeline from exomes - direct questions to Stefano Iantorno (sai2116@columbia.edu)" >> $LogFil
+echo "Number of samples is "$NoSamples >> $LogFil
+echo "Input list has "$NoCol" columns" >> $LogFil
+echo "Coverage information will go in"$COV_DIR >> $LogFil
 
 if [[ $NoCol == 2 ]]; then
 	StepNam="Starting CNV pipeline for $InpFil with $NoJobs parallel jobs, using $RefFil as reference"
-	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel.$$.log sh $COV_DIR/Run_RD_calculator.sh -i $SAMPLE_INFO_DIR/$InpFil -r $RefFil -l $LogFile -a {}"
+	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel.$$.log sh Run_RD_calculator.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
+	echo "Log file for GNU parallel is RD_calculator_parallel.$$.log" >> $LogFil
 	if [[ $Pipeline == "true" ]]; then StepCmd=$StepCmd" -P"; fi
 	echo $StepNam >> $LogFil
 	echo "~~~~" >> $LogFil
-	#eval $StepCmd
+	eval $StepCmd
 else
 	echo "Input has incorrect number of columns. Pipeline needs both bam files and sample IDs."
 	exit 1

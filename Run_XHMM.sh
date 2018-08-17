@@ -160,3 +160,4 @@ funcRunStep
 
 # xhmm --genotype -p /home/local/users/sai2116/bin/statgen-xhmm-cc14e528d909/params.txt -r $PROJECT_DIR/XHMM_output/$1.PCA_normalized.filtered.sample_zscores.RD.txt -R $PROJECT_DIR/XHMM_output/$1.same_filtered.RD.txt -g $PROJECT_DIR/XHMM_output/$1.xcnv -F $RES_DIR/hg19.fasta -v $PROJECT_DIR/XHMM_output/$1.vcf
 
+funcWriteEndLog
