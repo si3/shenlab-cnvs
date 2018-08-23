@@ -58,6 +58,22 @@ eval $StepCmd
 funcLogStepFinit
 }
 
+# Function to run and log batch jobs, variable will be the name of the batch job
+funcRunBatch () {
+if [[ $Pipeline == "true" ]]; then StepCmd=$StepCmd" -P"; fi
+if [[ `type -t "$StepCmd"` ]]; then
+        type $StepCmd | tail -n +3  >> $LogFil
+else
+	echo $StepCmd >> $LogFil
+fi
+echo "    "$StepNam  >> $LogFil
+echo "Using qsub to submit as batch job with ID="$1 >> $LogFil
+echo "#!/bin/batch" > $BatchNam.$$.sh
+echo $StepCmd >> $BatchNam.$$.sh
+StepCmd="qsub -N $1 -V -cwd $BatchNam.$$.sh"
+eval $StepCmd
+}
+
 # Function to log the end of each script and transfer the contents of temporary log file to the main log file
 funcWriteEndLog () {
 echo "End "$0" $0:`date`" >> $TmpLog
