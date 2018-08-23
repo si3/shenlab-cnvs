@@ -17,7 +17,7 @@
 
 usage="
 	this script initializes RD estimation for CNV exome pipeline
-	takes bam list file as input with 2 columns, bamfile path and sample ID
+	takes bam list file as input (2 columns, bamfile path + sample ID)
 	a windows file is required in ref file (follow prep steps)
 	can also start pipeline for a batch of samples
 
@@ -78,11 +78,18 @@ echo "Coverage information will go in"$COV_DIR >> $LogFil
 if [[ $NoCol == 2 ]]; then
 	StepNam="Starting CNV pipeline for $InpFil with $NoJobs parallel jobs, using $RefFil as reference"
 	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel.$$.log sh Run_RD_calculator.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
-	echo "Log file for GNU parallel is RD_calculator_parallel.$$.log" >> $LogFil
-	if [[ $Pipeline == "true" ]]; then StepCmd=$StepCmd" -P"; fi
+	echo "Log file for mosdepth/GNU parallel is RD_calculator_parallel.$$.log" >> $LogFil
+	echo "Log file for bedtools/GNU parallel is RD_calculator_parallel_2.$$.log" >> $LogFil
 	echo $StepNam >> $LogFil
 	echo "~~~~" >> $LogFil
-	eval $StepCmd
+	funcRunBatch RDcalc1
+	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel_2.$$.log sh Run_RD_calculator_2.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
+	funcRunBatch RDcalc2
+	if [[ $Pipeline == "true" ]]; then
+		NextJob="Run mosdepth and bedtools reformatter scripts"
+		NextCmd="qsub -hold_jid RDcalc1,RDcalc2 -V -cwd $COV_DIR/Run_RD_reformatter.sh -i $InpFil -r $RefFil -l $LogFil -P"
+		funcRunPipeline
+	fi
 else
 	echo "Input has incorrect number of columns. Pipeline needs both bam files and sample IDs."
 	exit 1
