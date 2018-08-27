@@ -18,29 +18,29 @@ This can be done to start a new project. The pipeline is designed to run on SGE 
 
 The general directory structure is as follows:
 
--/PROJ_DIR
- -Run_pipeline_initiator.sh
- -Run_RD_calculator.sh
- -Run_RD_calculator_2.sh
- -Run_RD_reformatters.sh
- -cnv.exome.lib.sh
- -cnv.exome.references.sh
+- /PROJ_DIR
+  - Run_pipeline_initiator.sh
+  - Run_RD_calculator.sh
+  - Run_RD_calculator_2.sh
+  - Run_RD_reformatters.sh
+  - cnv.exome.lib.sh
+  - cnv.exome.references.sh
 
--/COV_DIR
- -Run_bedtools_to_CANOES.sh
- -Run_mosdepth_to_XHMM.sh
- -Run_CLAMMS_normalizer.sh
- -Run_CLAMMS_model_fitter.sh
+- /COV_DIR
+  - Run_bedtools_to_CANOES.sh
+  - Run_mosdepth_to_XHMM.sh
+  - Run_CLAMMS_normalizer.sh
+  - Run_CLAMMS_model_fitter.sh
 	
--/CANOES_OUT
- -Run_CANOES.sh
+- /CANOES_OUT
+  - Run_CANOES.sh
 
--/CLAMMS_OUT
- -Run_CLAMMS.sh
+- /CLAMMS_OUT
+  - Run_CLAMMS.sh
 
--/XHMM_OUT
- -Run_XHMM.sh
- -Run_XHMM_reformatter.sh
+- /XHMM_OUT
+  - Run_XHMM.sh
+  - Run_XHMM_reformatter.sh
 
 The file cnv.exome.references.sh contains all the variables called by the different scripts. Two more directories, /RES_DIR and /SAMPLE_INFO_DIR, need to be created by user in /PROJ_DIR, and cnv.exome.references.sh needs to be updated with the correct path for various reference files to be loaded correctly in the pipeline. The file cnv.exome.lib.sh contains functions used by several steps of the pipeline.
 
@@ -69,5 +69,5 @@ The relevant usage information will be printed to screen.
 
 -----------------------------------
 
--CLAMMS <https://github.com/rgcgithub/clamms>
--XHMM <https://atgu.mgh.harvard.edu/xhmm/tutorial.shtml>
+- CLAMMS <https://github.com/rgcgithub/clamms>
+- XHMM <https://atgu.mgh.harvard.edu/xhmm/tutorial.shtml>
