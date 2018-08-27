@@ -56,7 +56,7 @@ The -P flag will call all subsequent steps of the pipeline. If you would like to
 Briefly, the flow is structured as follows:
 
 1) Run_pipeline_initiator.sh -> calls Run_RD_calculator.sh and Run_RD_calculator_2.sh
-2) Run_RD_reformatter.sh -> calls Run_bedtools_to_CANOES.sh
+2) Run_RD_reformatter.sh -> calls Run_bedtools_to_CANOES.sh and Run_mosdepth_to_XHMM.sh
 3) Run_CLAMMS.sh -> calls Run_CLAMMS_normalizer.sh and Run_CLAMMS_model_fitter.sh
 4) Run_XHMM.sh -> calls CLAMMS specific scripts
 5) Run_CANOES.sh -> calls CANOES.R
