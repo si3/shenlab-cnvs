@@ -8,7 +8,7 @@
 # ArrNum - (optional) line argument of input file to process, defaults to 1
 # LogFil - (optional) log to monitor progress
 # TgtBed - (optional) capture kit used in this batch, may be redundant
-# Pipeline - continues pipeline by running next step
+# Pipeline - continues pipeline by invoking bedtools RD_calculator
 # Help - get usage information
 
 # List of variables used in this script
@@ -26,7 +26,7 @@
 
 usage="
 	this script is optimized for estimating RD in CNV exome pipeline
-	using both mosdepth and bedtools, needs a ref file per batch run
+	using mosdepth to get mean RD in intervals, needs a ref file per batch run
 	parallelizes jobs with GNU parallel
 	
 	Run_RD_calculator.sh
@@ -74,10 +74,11 @@ BamFil=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 1)
 BamNam=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 2)
 WindFil=`readlink -f $WindFil`
 LogFil=`readlink -f $LogFil`
+LogNam=`basename $LogFil`
 
-TmpLog="RD_calculator_"$LogFil
+TmpLog="RD_calculator_"$LogNam
 
-# Load script library
+# Load function library
 source $PROJ_DIR/cnv.exome.lib.sh
 
 ProcessName="calculating RD in intervals"
@@ -87,6 +88,8 @@ if [[ $ArrNum == 1 ]]; then
 	echo "Considering reads with minimum MQ="$Min_MQ >> $TmpLog
 fi
 
+# Check if BAM or CRAM
+
 #StepNam="Running dummy test"
 #StepCmd="echo $BamNam >> $PROJ_DIR/dummy.test"
 
@@ -94,33 +97,32 @@ StepNam="Running mosdepth for "$BamNam
 StepCmd="mosdepth --by $WindFil $BamNam $BamFil -Q $Min_MQ"
 funcRunStep
 
-StepNam="Running bedtools for "$BamNam
-StepCmd="bedtools multicov -bams $BamFil -bed $WindFil -q $Min_MQ | awk '{print $1, $2, $3, $NF, $NF/($3-$2)}' > $COV_DIR/$BamNam.coverage.bed"
-funcRunStep
+#StepNam="Running bedtools for "$BamNam
+#StepCmd="bedtools multicov -bams $BamFil -bed $WindFil -q $Min_MQ | awk '{print $1, $2, $3, $NF, $NF/($3-$2)}' > $COV_DIR/$BamNam.coverage.bed"
+#funcRunStep
 
 if [[ $ArrNum == $NoSamples ]]; then # Checks end job, does housekeeping
 	echo "Parallel is done" >> $TmpLog
-	mkdir mosdepth
-	mkdir bedtools
-	mv *.regions.bed.gz ./mosdepth
-	mv *.regions.bed.gz.csi ./mosdepth
-	mv *.per-base.bed.gz ./mosdepth
-	mv *.per-base.bed.gz.csi ./mosdepth
-	mv *.mosdepth.global.dist.txt ./mosdepth
-	mv *.coverage.bed ./bedtools 
-	echo "Directories mosdepth and bedtools created in "$COV_DIR >> $TmpLog
+	mkdir $COV_DIR/mosdepth
+	#mkdir bedtools
+	mv *.regions.bed.gz $COV_DIR/mosdepth
+	mv *.regions.bed.gz.csi $COV_DIR/mosdepth
+	mv *.per-base.bed.gz $COV_DIR/mosdepth
+	mv *.per-base.bed.gz.csi $COV_DIR/mosdepth
+	mv *.mosdepth.global.dist.txt $COV_DIR/mosdepth
+	mv *.mosdepth.region.dist.txt $COV_DIR/mosdepth
+	#mv *.coverage.bed ./bedtools 
+	echo "Directory mosdepth created in "$COV_DIR >> $TmpLog
 	if [[ $Pipeline == "true" ]]; then  
-		NextJob="Run mosdepth and bedtools reformatter scripts"
-		NextCmd="bash Run_RD_reformatters.sh -P"
-		funcPipeline #checks if P is flagged automatically and writes to TmpLog
+		NextJob="bedtools RD calculator script"
+		NextCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel_2.$$.log sh Run_RD_calculator_2.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
+		#NextCmd="bash Run_RD_reformatters.sh -i $InpFil -r $RefFil -l $LogFil -P"
+		funcPipeBatch #checks if P is flagged automatically and writes to LogFil
 	fi
 	funcWriteEndLog
 else
 	echo "Parallel was working on sample number "$ArrNum >> $TmpLog
 fi
-
-	
- 
 
 #Housekeeping
 
