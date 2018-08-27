@@ -62,3 +62,8 @@ At any point, you can type the following to get more information on each script:
 bash <script> -H
 
 The relevant usage information will be printed to screen.
+
+-----------------------------------
+
+CLAMMS <https://github.com/rgcgithub/clamms>
+XHMM <https://atgu.mgh.harvard.edu/xhmm/tutorial.shtml>
