@@ -60,18 +60,46 @@ funcLogStepFinit
 
 # Function to run and log batch jobs, variable will be the name of the batch job
 funcRunBatch () {
-if [[ $Pipeline == "true" ]]; then StepCmd=$StepCmd" -P"; fi
 if [[ `type -t "$StepCmd"` ]]; then
         type $StepCmd | tail -n +3  >> $LogFil
 else
 	echo $StepCmd >> $LogFil
 fi
 echo "    "$StepNam  >> $LogFil
-echo "Using qsub to submit as batch job with ID="$1 >> $LogFil
+echo "Using qsub to submit as batch job with ID="$BatchNam >> $LogFil
 echo "#!/bin/batch" > $BatchNam.$$.sh
 echo $StepCmd >> $BatchNam.$$.sh
-StepCmd="qsub -N $1 -V -cwd $BatchNam.$$.sh"
-eval $StepCmd
+# checks for arguments, if present uses them as jobIDs that need completion
+if [[ -n $1 ]]; then
+	StepCmd="qsub -hold_jid $1 -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
+	eval $StepCmd
+else
+	StepCmd="qsub -N $BatchNam -pe smp $NoJobs -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
+	eval $StepCmd
+fi
+}
+
+
+
+#Function to run and log batch jobs, as part of pipeline
+funcPipeBatch () {
+if [[ "$Pipeline" == "true" ]]; then
+	echo "- Call $NextJob `date`:" >> $LogFil
+	echo "	"$NextCmd >> $LogFil
+	echo "Using qsub to submit as batch job with ID="$BatchNam >> $LogFil
+	echo "#!/bin/batch" > $BatchNam.$$.sh
+	echo $NextCmd >> $BatchNam.$$.sh
+	if [[ -n $1 ]]; then
+		NextCmd="qsub -hold_jid $1 -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
+		eval $NextCmd
+	else
+		NextCmd="qsub -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
+		eval $NextCmd
+	fi
+else
+	echo $NextCmd >> $LogFil
+	echo "Cannot start next qsub job without -P flag" >> $LogFil
+fi
 }
 
 # Function to log the end of each script and transfer the contents of temporary log file to the main log file
@@ -88,7 +116,7 @@ funcPipeline (){
 if [[ "$Pipeline" == "true" ]]; then
     echo "- Call $NextJob `date`:" >> $TmpLog
     echo "    "$NextCmd  >> $TmpLog
-    NextCmd="nohup "$NextCmd" &"
+    NextCmd=$NextCmd" &"
     eval $NextCmd >> $TmpLog
     echo "----------------------------------------------------------------" >> $TmpLog
 else

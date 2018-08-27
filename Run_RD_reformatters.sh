@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # This script takes output from mosdepth and bedtools and converts it into input for CANOES, XHMM, CLAMMS
-# Calls subscripts that need to be in COV_DIR (same as output from mosdepth and bedtools)
+# Calls other scripts that need to be in COV_DIR (same as output from mosdepth and bedtools)
 # If P="true" then it will also call XHMM and CLAMMS (support for CANOES pending)
+# 
 
 # InpFil - (required) path to bam file or bam list
 # RefFil - (required) shell file containing resources for this batch run
@@ -16,6 +17,12 @@
 # PROJ_DIR
 # RES_DIR
 # SAMPLE_INFO_DIR
+
+# List of scripts:
+# Run_bedtools_to_CANOES.sh
+# Run_mosdepth_to_XHMM.sh
+# Run_XHMM (if $Pipeline=true)
+# Run_CLAMMS_normalizer (if $Pipeline=true)
 
 usage="
 	this script will convert output from mosdepth and bedtools
@@ -35,7 +42,7 @@ usage="
 
 Pipeline="false"
 
-while getopts i:r:l:a:t:PH opt; do
+while getopts i:r:l:t:PH opt; do
         case "$opt" in
                 i) InpFil="$OPTARG";;
                 r) RefFil="$OPTARG";;
@@ -60,46 +67,58 @@ if [[ ! -d "$COV_DIR/mosdepth" ]] || [[ ! -d "$COV_DIR/bedtools" ]]; then echo "
 InpFil=`readlink -f $InpFil`
 NoSamples=`wc -l $InpFil | cut -f1 -d" "`
 NoJobs=$NoJobs
-BamFil=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 1)
-BamNam=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 2)
+#BamFil=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 1)
+#BamNam=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 2)
 WindFil=`readlink -f $WindFil`
-LogFil=`readlink -f $LogFil`
 
-TmpLog="RD_reformatter_"$LogFil
+# Create log file unless specified
+if [[ -z "$LogFil" ]]; then
+        LogFil=ReformatRDexomeCNV.$$.log
+else
+        LogFil=`readlink -f $LogFil`
+fi
+
+LogNam=`basename $LogFil`
+TmpLog="RD_reformatter_"$LogNam
 
 # Load script library
 source $PROJ_DIR/cnv.exome.lib.sh
 
+# Starts TmpLog
 ProcessName="reformatting RD output"
 funcWriteStartLog
 
 # First run bedtools_to_CANOES and then initiate CANOES pipeline if -P
+mv $COV_DIR/Run_bedtools_to_CANOES.sh $COV_DIR/bedtools
 StepNam="Converting bedtools to CANOES"
-StepCmd="bash Run_bedtools_to_CANOES.sh $InpFil $WindFil"
+StepCmd="bash $COV_DIR/bedtools/Run_bedtools_to_CANOES.sh $InpFil $WindFil $COV_DIR/bedtools"
 funcRunStep
 
 # NextJob= 
-# Runs CANOES R scripts
+# if [[Pipeline]] Runs CANOES R scripts
 # funcRunPipeline
 
 # Secondly run mosdepth_to_XHMM, initiate XHMM pipeline if -P
+mv $COV_DIR/Run_mosdepth_to_XHMM.sh $COV_DIR/mosdepth
 StepNam="Converting mosdepth to XHMM"
-StepCmd="bash Run_mosdepth_to_XHMM.sh $InpFil $WindFil"
+StepCmd="bash $COV_DIR/mosdepth/Run_mosdepth_to_XHMM.sh $InpFil $WindFil $COV_DIR/mosdepth"
 funcRunStep
 
-wait
+#wait
 
-NextJob="Calling CNVs using XHMM"
-NextCmd="bash Run_XHMM.sh"
-funcRunPipeline
+#if [[Pipeline]]
+#NextJob="Calling CNVs using XHMM"
+#NextCmd="bash $XHMM_OUT/Run_XHMM.sh"
+#funcPipeline
 
-# Thirdly run CLAMMS_normalizer, continue pipeline if -P
-NextJob="Starting CLAMMS workflow by normalizing in parallel $NoJobs samples at a time"
-NextCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_normalizer_parallel.$$.log sh $COV_DIR/Run.CLAMMS_normalizer.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
-if [[ $Pipeline == "true" ]]; then
-	NextCmd=$NextCmd" -P"
-else
-	NextCmd=$NextCmd
-fi
-funcRunPipeline
+# Thirdly continue pipeline, run CLAMMS workflow if -P
+#if [[ $Pipeline == "true" ]]; then
+	NextJob="CLAMMS workflow on $NoSamples samples"
+	NextCmd="bash $CLAMMS_OUT/Run_CLAMMS.sh -i $InpFil -r $RefFil -l $LogFil"
+	funcPipeline
+#else
+#	echo $NextCmd >> $TmpLog
+#	echo "Cannot start next step without -P flag" >> $TmpLog
+#fi
+
 funcWriteEndLog

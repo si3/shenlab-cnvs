@@ -76,36 +76,46 @@ BamFil=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 1)
 BamNam=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 2)
 WindFil=`readlink -f $WindFil`
 
-LogFil=`readlink -f $LogFil`
+if [[ -z "$LogFil" ]]; then
+        LogFil=NormCLAMMSexomeCNV.$$.log
+else
+        LogFil=`readlink -f $LogFil`
+fi
 
-TmpLog="RD_CLAMMS_normalizer_"$LogFil
+LogNam=`basename $LogFil`
+TmpLog="CLAMMS_normalizer_"$LogNam
 
 # Load script library
 source $PROJ_DIR/cnv.exome.lib.sh
 
-ProcessName="normalizing RD in intervals for CLAMMS"
+ProcessName="RD normalizer in intervals for CLAMMS"
 
 if [[ $ArrNum == 1 ]]; then
         funcWriteStartLog
         #echo "Considering reads with minimum MQ="$Min_MQ >> $TmpLog
 fi
 
+echo "Generating and sorting coverage file for $BamNam" >> $TmpLog
+gzip -dc $COV_DIR/mosdepth/$BamNam.regions.bed.gz | awk 'BEGIN{OFS="\t"};{print $1, $2, $3, $5}' | bedtools sort > $COV_DIR/mosdepth/$BamNam.coverage.bed
+
 # Run CLAMMS normalizer script
-StepNam="Generating and sorting coverage file for $BamNam"
-StepCmd="gzip -dc $COV_DIR/mosdepth/$BamNam.regions.bed.gz | awk '{OFS="\t"} ; {print $1, $2, $3, $5}' | bedtools sort > $COV_DIR/mosdepth/$BamNam.coverage.bed"
-funcRunStep
+# StepNam="Generating and sorting coverage file for $BamNam"
+# StepCmd="gzip -dc $COV_DIR/mosdepth/$BamNam.regions.bed.gz | awk -F"\t" '{print $1, $2, $3, $5}' | bedtools sort > $COV_DIR/mosdepth/$BamNam.coverage.bed"
+# funcRunStep
 
 StepNam="Running normalize_coverage for $BamNam"
-StepCmd="$CLAMMS_DIR/normalize_coverage $COV_DIR/mosdepth/$BamNam.coverage.bed $WindNFil > $COV_DIR/$BamNam.norm.cov.bed"
+StepCmd="$CLAMMS/normalize_coverage $COV_DIR/mosdepth/$BamNam.coverage.bed $WindFil > $COV_DIR/mosdepth/$BamNam.norm.cov.bed"
 funcRunStep
  
 
 if [[ $ArrNum == $NoSamples ]]; then # Checks end job, does housekeeping
         echo "Parallel is done" >> $TmpLog
         if [[ $Pipeline == "true" ]]; then
-                NextJob="Fit models based on knn reference samples and call CNVs per CLAMMS workflow"
-                NextCmd="bash Run_CLAMMS_model_fitter.sh -i $InpFil -r $RefFil -l $LogFil"
-                funcPipeline #checks if P is flagged automatically and writes to TmpLog
+                mv $CLAMMS_OUT/Run_CLAMMS_model_fitter.sh $COV_DIR/mosdepth
+		NextJob="CLAMMS workflow by fitting models based on knn reference samples and discover CNVs"
+		NextCmd="bash $COV_DIR/mosdepth/Run_CLAMMS_model_fitter.sh -i $InpFil -r $RefFil -l $LogFil"
+		BatchNam="CLAMMSfit1"
+		funcPipeBatch #checks if P is flagged automatically and writes to TmpLog
         fi
 	funcWriteEndLog
 	rm $COV_DIR/mosdepth/*.coverage.bed
