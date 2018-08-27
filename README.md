@@ -6,11 +6,11 @@ This integrated pipeline aims to call CNVs CNVs from whole-exome sequencing (WES
 
 To install, type the following while in your destination path:
 
-git clone git@github.com:si3/shenlab-cnvs.git
+`git clone git@github.com:si3/shenlab-cnvs.git`
 
 Then rename the directory to a specific project name:
 
-mv shenlab-cnvs <name of project>
+`mv shenlab-cnvs <name of project>`
 
 This can be done to start a new project. The pipeline is designed to run on SGE HPC (biocluster). It uses a combination of GNU parallel and qsub to parallelize processes, and therefore needs to be started on a head node. In addition to GNU parallel, XHMM, CLAMMS, mosdepth, and bedtools need to be installed and in path. For some of the preparatory and analysis steps, PICARD and PLINK/PSEQ are also required. Please refer to individual scripts for requirements of each step.
 
@@ -18,25 +18,29 @@ This can be done to start a new project. The pipeline is designed to run on SGE 
 
 The general directory structure is as follows:
 
-/PROJ_DIR
-	Run_pipeline_initiator.sh
-	Run_RD_calculator.sh
-	Run_RD_calculator_2.sh
-	Run_RD_reformatters.sh
-	cnv.exome.lib.sh
-	cnv.exome.references.sh
-	/COV_DIR
-		Run_bedtools_to_CANOES.sh
-		Run_mosdepth_to_XHMM.sh
-		Run_CLAMMS_normalizer.sh
-		Run_CLAMMS_model_fitter.sh
-	/CANOES_OUT
-		Run_CANOES.sh
-	/CLAMMS_OUT
-		Run_CLAMMS.sh
-	/XHMM_OUT
-		Run_XHMM.sh
-		Run_XHMM_reformatter.sh
+-/PROJ_DIR
+ -Run_pipeline_initiator.sh
+ -Run_RD_calculator.sh
+ -Run_RD_calculator_2.sh
+ -Run_RD_reformatters.sh
+ -cnv.exome.lib.sh
+ -cnv.exome.references.sh
+
+-/COV_DIR
+ -Run_bedtools_to_CANOES.sh
+ -Run_mosdepth_to_XHMM.sh
+ -Run_CLAMMS_normalizer.sh
+ -Run_CLAMMS_model_fitter.sh
+	
+-/CANOES_OUT
+ -Run_CANOES.sh
+
+-/CLAMMS_OUT
+ -Run_CLAMMS.sh
+
+-/XHMM_OUT
+ -Run_XHMM.sh
+ -Run_XHMM_reformatter.sh
 
 The file cnv.exome.references.sh contains all the variables called by the different scripts. Two more directories, /RES_DIR and /SAMPLE_INFO_DIR, need to be created by user in /PROJ_DIR, and cnv.exome.references.sh needs to be updated with the correct path for various reference files to be loaded correctly in the pipeline. The file cnv.exome.lib.sh contains functions used by several steps of the pipeline.
 
@@ -46,7 +50,7 @@ The workflow is organized in ordered steps to ensure that the results are intern
 
 First you need to configure each reference shell script with the path to the correct interval files, samples, and sample information files, as well as any other parameters specific to CLAMMS and XHMM workflow for your pipeline run. For each batch of bam files with the same intervals (i.e. generated with same capture kit) you can run the following using the same reference shell script. Multiple cnv.exome.references.sh can be created if you plan on running multiple pipelines at the same time for different batches of samples.
 
-bash Run_pipeline_initiator -i path/to/bam_list -r path/to/cnv.exome.references.sh -P
+`bash Run_pipeline_initiator.sh -i path/to/bam_list -r path/to/cnv.exome.references.sh -P`
 
 The -P flag will call all subsequent steps of the pipeline. If you would like to do each step manually, omit the -P flag and follow the instructions below. 
 Briefly, the flow is structured as follows:
@@ -59,11 +63,11 @@ Briefly, the flow is structured as follows:
 
 At any point, you can type the following to get more information on each script:
 
-bash <script> -H
+`bash <script> -H`
 
 The relevant usage information will be printed to screen.
 
 -----------------------------------
 
-CLAMMS <https://github.com/rgcgithub/clamms>
-XHMM <https://atgu.mgh.harvard.edu/xhmm/tutorial.shtml>
+-CLAMMS <https://github.com/rgcgithub/clamms>
+-XHMM <https://atgu.mgh.harvard.edu/xhmm/tutorial.shtml>
