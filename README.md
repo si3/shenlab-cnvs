@@ -61,4 +61,4 @@ At any point, you can type the following to get more information on each script:
 
 bash <script> -H
 
-And relevant usage information will be printed to screen.
+The relevant usage information will be printed to screen.
