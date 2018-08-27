@@ -52,6 +52,9 @@ done
 RefFil=`readlink -f $RefFil`
 source $RefFil
 
+# Load function library
+source $PROJ_DIR/cnv.exome.lib.sh
+
 #InpFil=`readlink -f $SAMPLE_INFO_DIR/$InpFil`
 InpFil=`readlink -f $InpFil`
 #BamFil=$(tail -n+$ArrNum $InpFil | head -n 1 | cut -f 1)
@@ -80,15 +83,17 @@ if [[ $NoCol == 2 ]]; then
 	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel.$$.log sh Run_RD_calculator.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
 	echo "Log file for mosdepth/GNU parallel is RD_calculator_parallel.$$.log" >> $LogFil
 	echo "Log file for bedtools/GNU parallel is RD_calculator_parallel_2.$$.log" >> $LogFil
-	echo $StepNam >> $LogFil
 	echo "~~~~" >> $LogFil
-	funcRunBatch RDcalc1
+	BatchNam="RDcalc1"
+	funcRunBatch
 	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel_2.$$.log sh Run_RD_calculator_2.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
-	funcRunBatch RDcalc2
+	BatchNam="RDcalc2"
+	funcRunBatch
 	if [[ $Pipeline == "true" ]]; then
-		NextJob="Run mosdepth and bedtools reformatter scripts"
-		NextCmd="qsub -hold_jid RDcalc1,RDcalc2 -V -cwd $COV_DIR/Run_RD_reformatter.sh -i $InpFil -r $RefFil -l $LogFil -P"
-		funcRunPipeline
+		NextJob="mosdepth and bedtools reformatter scripts"
+		NextCmd="bash $PROJ_DIR/Run_RD_reformatters.sh -i $InpFil -r $RefFil -l $LogFil -P"
+		BatchNam="RDref1"
+		funcPipeBatch RDcalc1,RDcalc2
 	fi
 else
 	echo "Input has incorrect number of columns. Pipeline needs both bam files and sample IDs."

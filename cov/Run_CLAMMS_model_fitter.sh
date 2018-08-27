@@ -3,6 +3,7 @@
 # This script trains models on pre-determined K-nn reference panel
 # Then fits them to normalized RD for each sample and calls CNVs
 # Script has to be in COV_DIR (same as output from mosdepth) for ref.panel files to work
+# Requires the presence of knn directory with 50nn reference samples
 # 
 # InpFil - (required) path to bam file or bam_list
 # RefFil - (required) path to shell file containing resources for this batch run
@@ -54,26 +55,31 @@ BATCH=`basename $InpFil | cut -f1 -d"."`
 
 NoSamples=`wc -l $InpFil | cut -f1 -d" "`
 WindFil=`readlink -f $WindFil`
-LogFil=`readlink -f $LogFil`
 
-TmpLog="RD_CLAMMS_fitter_"$LogFil
+if [[ -z "$LogFil" ]]; then
+        LogFil=FitCLAMMSexomeCNV.$$.log
+else
+        LogFil=`readlink -f $LogFil`
+fi
+
+LogNam=`basename $LogFil`
+TmpLog="CLAMMS_caller_"$LogNam
 
 # Loading script library
 
 source $PROJ_DIR/cnv.exome.lib.sh
 
-ProcessName="Running CLAMMS fit_models and call_cnv on $NoSamples samples"
+ProcessName="Model fitting and CNV discovery using CLAMMS"
 funcWriteStartLog
 
 # Extract sex information
 
-StepNam="Extracting sex information"
-StepCmd="cut -f2 $InpFil | while read SAMPLE; do
-       FILE=`echo "$SAMPLE".norm.cov.bed`
-       echo -e -n "$SAMPLE\t$FILE\t"
-       grep "^Y" $COV_DIR/mosdepth/$SAMPLE.norm.cov.bed | awk '{ x += $4; n++; } END { if (x/n >= 0.1) print "M"; else print "F"; }'
-done > $CLAMMS_OUT/$BATCH.samples.sex.txt"
-funcRunStep
+echo "Extracting sex information and storing it in $CLAMMS_OUT" >> $TmpLog
+cut -f2 $InpFil | while read SAMPLE; do
+	FILE=`echo "$SAMPLE".norm.cov.bed`
+	echo -e -n "$SAMPLE\t$FILE\t"
+	grep "^Y" $COV_DIR/mosdepth/$SAMPLE.norm.cov.bed | awk '{ x += $4; n++; } END { if (x/n >= 0.1) print "M"; else print "F"; }'
+done > $CLAMMS_OUT/$BATCH.samples.sex.txt
 
 # Housekeeping
 
@@ -84,15 +90,15 @@ mkdir $CLAMMS_OUT/calls
 
 # Fit models, call CNVs using CLAMMS
 
-StepNam="Running fit_models and call_cnv"
-StepCmd="cut -f2 $InpFil | while read SAMPLE; do
+echo "Running fit_models and call_cnv per CLAMMS workflow" >> $TmpLog
+echo "Creating reference panels and models for $NoSamples samples, storing them in $COV_DIR/mosdepth" >> $TmpLog
+cut -f2 $InpFil | while read SAMPLE; do
 	SEX=`echo "$SAMPLE" | join - $CLAMMS_OUT/$BATCH.samples.sex.sorted.txt | tr ' ' '\t' | cut -f 3`
 	join $CLAMMS_OUT/knn/$SAMPLE.50nns.txt.sorted $CLAMMS_OUT/$BATCH.samples.sex.sorted.txt | tr ' ' '\t' | cut -f 2- > $COV_DIR/mosdepth/$SAMPLE.ref.panel.txt 
-	$CLAMMS_DIR/fit_models $COV_DIR/mosdepth/$SAMPLE.ref.panel.txt $2 > $CLAMMS_OUT/models/$SAMPLE.models.bed
-	$CLAMMS_DIR/call_cnv $COV_DIR/mosdepth/$SAMPLE.norm.cov.bed $CLAMMS_OUT/models/$SAMPLE.models.bed --sex $SEX > $CLAMMS_OUT/calls/$SAMPLE.cnv.bed
-done"
-funcRunStep
+	$CLAMMS/fit_models $COV_DIR/mosdepth/$SAMPLE.ref.panel.txt $WindFil > $CLAMMS_OUT/models/$SAMPLE.models.bed
+	$CLAMMS/call_cnv $COV_DIR/mosdepth/$SAMPLE.norm.cov.bed $CLAMMS_OUT/models/$SAMPLE.models.bed --sex $SEX > $CLAMMS_OUT/calls/$SAMPLE.cnv.bed
+done
 
 echo "All CNV calls from CLAMMS were stored in $CLAMMS_OUT/calls" >> $TmpLog
 funcWriteEndLog
-
+mailx -s "CLAMMS pipeline run completed" $USER < $LogFil

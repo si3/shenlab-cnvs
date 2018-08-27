@@ -42,7 +42,7 @@ WIND=`basename $1 | cut -f1 -d"."`
 RefFil=`readlink -f $2`
 source $RefFil
 
-$CLAMMS_DIR/annotate_windows.sh $RES_DIR/$TgtFil $RES_DIR/hg19.fasta $RES_DIR/mappability.75mer.clamms.sorted.bed $INSERT_SIZE $CLAMMS_DIR/data/clamms_special_regions.grch38.bed > $RES_DIR/$1.250bp.windows.bed
+$CLAMMS_DIR/annotate_windows.sh $TgtFil $REF $MAP_REG $INSERT_SIZE $SPEC_REG > $RES_DIR/$WIND.windows.bed
 
 # $CLAMMS_DIR/annotate_windows.sh $1.sorted.targets.bed hg19.clamms.fasta mappability.75mer.clamms.sorted.bed $INSERT_SIZE $CLAMMS_DIR/data/clamms_special_regions.grch38.bed > $1.windows.bed
 

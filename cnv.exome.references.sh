@@ -1,5 +1,6 @@
 # Directories of various resources used in scripts
 # Path is per my home directory on biocluster
+# Direct any questions to Stefano Iantorno (sai2116@columbia.edu)
 # Change accordingly to adapt to your preferences
 
 PROJ_DIR="/home/sai2116/shenlab-cnvs"
@@ -38,6 +39,7 @@ SCv2win="/home/sai2116/shenlab-cnvs/res/SeqCap_EZ_Exome_v2.hg19.windows.bed"
 SSv2win="/home/sai2116/shenlab-cnvs/res/SureSelect_All_Exon_V2_b37.windows.bed"
 SSv4win="/home/sai2116/shenlab-cnvs/res/SureSelect_All_Exon_V4_b37.windows.bed"
 
+TgtFil=$SSv4
 WindFil=$SSv4win
 
 # CLAMMS specific reference files
@@ -48,7 +50,7 @@ INSERT_SIZE=250
 SPEC_REG="$RES_DIR/clamms_special_regions.hg19.excluded_contigs.bed"
 MAP_REG="$RES_DIR/mappability.75mer.clamms.bed"
 
-# XHMM specific reference files
+# XHMM specific reference files, also edit params.txt file in $XHMM directory for CNV discovery specific parameters
 minTargetSize=10
 maxTargetSize=10000
 minMeanTargetRD=10
@@ -64,3 +66,10 @@ extremeGC="$RES_DIR/SureSelect_All_Exon_V4_b37.extreme_gc_targets.txt"
 lowcomp="$RES_DIR/SureSelect_All_Exon_V4_b37.low_complexity_targets.txt"
 
 # CANOES specific reference files
+
+# qsub specific parameters
+MaxMem="6G" #-l h_vmem=<size>
+#for -pe smp <n_slots>, use $NoJobs 
+
+# USER email for notification
+USER="sai2116@columbia.edu"
