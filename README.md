@@ -2,7 +2,7 @@
 
 Direct questions to Stefano Iantorno (sai2116@columbia.edu, si3@github)
 
-This integrated pipeline aims to call CNVs CNVs from whole-exome sequencing (WES) data with three different read-depth based tools (CLAMMS, XHMM, CANOES) and is designed to consolidate commonalities while minimizing redundancy at each step of the workflow. The rationale behind integrating three different tools stems from the fact that each tool has specific strengths and weaknesses, and relies on different approaches to modeling read depth variation, GC, and sequence complexity. Please refer to the original publications for precision and recall of each too, as well as benchmarking information. We attempt to provide a blueprint of a typical workflow that is customizable with minimal modification of shell scripts.
+This integrated pipeline aims to call CNVs from whole-exome sequencing (WES) data with three different read-depth based tools (CLAMMS, XHMM, CANOES) and is designed to consolidate commonalities while minimizing redundancy at each step of the workflow. The rationale behind integrating three different tools stems from the fact that each tool has specific strengths and weaknesses, and relies on different approaches to modeling read depth variation, GC, and sequence complexity. Please refer to the original publications for precision and recall of each tool, as well as benchmarking information. We attempt to provide a blueprint of a typical workflow that is customizable with minimal modification of shell scripts.
 
 To install, type the following while in your destination path:
 
