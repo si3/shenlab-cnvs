@@ -17,7 +17,7 @@ XHMM_OUT="/home/sai2116/shenlab-cnvs/XHMM_output"
 
 PICARD="/share/apps/jar/picard.jar"
 CLAMMS="/home/sai2116/bin/clamms"
-XHMM="/home/sai2116/bin/statgen-xhmm-cc14e528d909"
+XHMM="/home/sai2116/bin/xhmm"
 
 # Reference files
 
@@ -65,11 +65,29 @@ discoverSQ=0 # Q_SOME cutoff for CNV discover, set to 0 for all CNVs
 extremeGC="$RES_DIR/SureSelect_All_Exon_V4_b37.extreme_gc_targets.txt"
 lowcomp="$RES_DIR/SureSelect_All_Exon_V4_b37.low_complexity_targets.txt"
 
+# Other parameters used for estimation of posterior probability are in $XHMM/params.txt
+# ***********************************************************************
+# Input CNV parameters file:
+# ***********************************************************************
+# 1e-08   6       70      -3      1       0       1       3       1
+# ***********************************************************************
+# translates into XHMM parameters of:
+# ***********************************************************************
+# Pr(start DEL) = Pr(start DUP) = 1e-08
+# Mean number of targets in CNV [geometric distribution] = 6
+# Mean distance between targets within CNV [exponential decay] = 70 KB
+#
+# DEL read depth distribution ~ N(mean=-3, var=1)
+# DIP read depth distribution ~ N(mean=0, var=1)
+# DUP read depth distribution ~ N(mean=3, var=1)
+#***********************************************************************
+
+
 # CANOES specific reference files
 
 # qsub specific parameters
-MaxMem="6G" #-l h_vmem=<size>
-#for -pe smp <n_slots>, use $NoJobs 
+MaxMem="6G" # used in -l h_vmem=<size>
+# for -pe smp <n_slots>, use $NoJobs 
 
 # USER email for notification
 USER="sai2116@columbia.edu"

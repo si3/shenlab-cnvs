@@ -106,19 +106,27 @@ funcRunStep
 
 #wait
 
-#if [[Pipeline]]
-#NextJob="Calling CNVs using XHMM"
-#NextCmd="bash $XHMM_OUT/Run_XHMM.sh"
-#funcPipeline
-
 # Thirdly continue pipeline, run CLAMMS workflow if -P
-#if [[ $Pipeline == "true" ]]; then
+if [[ $Pipeline == "true" ]]; then
 	NextJob="CLAMMS workflow on $NoSamples samples"
 	NextCmd="bash $CLAMMS_OUT/Run_CLAMMS.sh -i $InpFil -r $RefFil -l $LogFil"
+#	BatchNam="CLAMMScnv1"
 	funcPipeline
-#else
-#	echo $NextCmd >> $TmpLog
-#	echo "Cannot start next step without -P flag" >> $TmpLog
-#fi
+	NextJob="XHMM workflow on $NoSamples samples"
+	NextCmd="bash $XHMM_OUT/Run_XHMM.sh -i $InpFil r $RefFil -l $LogFil"
+	BatchNam="XHMMcnv1"
+	funcPipeBatch
+#	NextJob="CANOES workflow on $NoSamples samples"
+#	NextCmd="bash $CANOES_OUT/Run_CANOES.sh"
+#	BatchNam="CANOEScnv1"
+#	funcPipeBatch
+#	NextJob="notification of pipeline completion"
+#	NextCmd=`mailx -s "XHMM pipeline run completed" $USER < $LogFil`
+#	BatchNam="cnvNote1"
+#	funcPipeline CLAMMScnv1, XHMMcnv1, CANOEScnv1 
+else
+	echo "CNV calling workflows not started" >> $TmpLog
+	echo "Cannot start next step without -P flag" >> $TmpLog
+fi
 
 funcWriteEndLog

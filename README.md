@@ -2,7 +2,7 @@
 
 Direct questions to Stefano Iantorno (sai2116@columbia.edu, si3@github)
 
-This integrated pipeline aims to call CNVs CNVs from whole-exome sequencing (WES) data with three different read-depth based tools (CLAMMS, XHMM, CANOES) and is designed to consolidate commonalities while minimizing redundancy at each step of the workflow. The rationale behind integrating three different tools stems from the fact that each tool has specific strengths and weaknesses, and relies on different approaches to modeling read depth variation, GC, and sequence complexity. Please refer to the original publications for precision and recall of each too, as well as benchmarking information. We attempt to provide a blueprint of a typical workflow that is customizable with minimal modification of shell scripts.
+This integrated pipeline aims to call CNVs from whole-exome sequencing (WES) data with three different read-depth based tools (CLAMMS, XHMM, CANOES) and is designed to consolidate commonalities while minimizing redundancy at each step of the workflow. The rationale behind integrating three different tools stems from the fact that each tool has specific strengths and weaknesses, and relies on different approaches to modeling read depth variation, GC, and sequence complexity. Please refer to the original publications for precision and recall of each tool, as well as benchmarking information. We attempt to provide a blueprint of a typical workflow that is customizable with minimal modification of shell scripts.
 
 To install, type the following while in your destination path:
 
@@ -46,7 +46,7 @@ The file cnv.exome.references.sh contains all the variables called by the differ
 
 -----------------------------------
 
-The workflow is organized in ordered steps to ensure that the results are internally consistent and that calls can be compared across methods. The pipeline relies on a windows.bed file as the interval file used to estimate read depth in exon capture regions. These “windows” will be based on the capture kit intervals used for each batch of samples, but won’t have the same coordinates. Specifically, large exons will be broken down into ~500bp segments. Please refer to CLAMMS github page for more information.
+The workflow is organized in ordered steps to ensure that the results are internally consistent and that calls can be compared across methods. The pipeline relies on a windows.bed file as the interval file used to estimate read depth in exon capture regions. These “windows” will be based on the capture kit intervals used for each batch of samples, but won’t have the same coordinates. Specifically, large exons will be broken down into ~500bp segments. Please refer to CLAMMS github page for more information. The initial steps of the XHMM workflow are modified to eliminate unnecessary extra steps. The pipeline uses the windows.bed file instead of a interval_list file as input.
 
 First you need to configure each reference shell script with the path to the correct interval files, samples, and sample information files, as well as any other parameters specific to CLAMMS and XHMM workflow for your pipeline run. For each batch of bam files with the same intervals (i.e. generated with same capture kit) you can run the following using the same reference shell script. Multiple cnv.exome.references.sh can be created if you plan on running multiple pipelines at the same time for different batches of samples.
 

@@ -117,7 +117,7 @@ if [[ "$Pipeline" == "true" ]]; then
     echo "- Call $NextJob `date`:" >> $TmpLog
     echo "    "$NextCmd  >> $TmpLog
     NextCmd=$NextCmd" &"
-    eval $NextCmd >> $TmpLog
+    eval $NextCmd
     echo "----------------------------------------------------------------" >> $TmpLog
 else
     echo "- To start $NextJob run the following command:" >> $TmpLog

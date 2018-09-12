@@ -88,6 +88,8 @@ rm $CLAMMS_OUT/$BATCH.samples.sex.txt
 mkdir $CLAMMS_OUT/models
 mkdir $CLAMMS_OUT/calls
 
+cd "$(dirname "$0")"
+
 # Fit models, call CNVs using CLAMMS
 
 echo "Running fit_models and call_cnv per CLAMMS workflow" >> $TmpLog
@@ -101,4 +103,4 @@ done
 
 echo "All CNV calls from CLAMMS were stored in $CLAMMS_OUT/calls" >> $TmpLog
 funcWriteEndLog
-mailx -s "CLAMMS pipeline run completed" $USER < $LogFil
+#mailx -s "CLAMMS pipeline run completed" $USER < $LogFil
