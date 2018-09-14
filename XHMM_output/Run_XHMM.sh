@@ -43,7 +43,7 @@ while getopts i:r:l:t:H opt; do
 done
 
 # Check input
-if [[ ! -e "$InpFil" ]] || [[ ! -e "$RefFil" ]]; then echo "Missing/incorrect required arguments"; echo "$usage"; exit; fi
+# if [[ ! -e "$InpFil" ]] || [[ ! -e "$RefFil" ]]; then echo "Missing/incorrect required arguments"; echo "$usage"; exit; fi
 
 # Call the RefFil to load variables
 RefFil=`readlink -f $RefFil`

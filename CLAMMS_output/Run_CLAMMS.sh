@@ -78,7 +78,7 @@ funcRunBatch
 
 # Then run CLAMMS_model_fitter and call CNVs
 mv $COV_DIR/Run_CLAMMS_model_fitter.sh $COV_DIR/mosdepth
-StepNam="Fitting models "
+StepNam="Fitting models and discovering CNVs"
 StepCmd="bash $COV_DIR/mosdepth/Run_CLAMMS_model_fitter.sh -i $InpFil -r $RefFil -l $LogFil"
 BatchNam="CLAMMSfit1"
 funcRunBatch CLAMMSnorm1
