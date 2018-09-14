@@ -94,6 +94,19 @@ if [[ $NoCol == 2 ]]; then
 		NextCmd="bash $PROJ_DIR/Run_RD_reformatters.sh -i $InpFil -r $RefFil -l $LogFil -P"
 		BatchNam="RDref1"
 		funcPipeBatch RDcalc1,RDcalc2
+		NextJob="CLAMMS workflow on $NoSamples samples"
+		NextCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog CLAMMS_normalizer_parallel.$$.log sh $COV_DIR/Run_CLAMMS_normalizer.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
+		#NextCmd="bash $CLAMMS_OUT/Run_CLAMMS.sh -i $InpFil -r $RefFil -l $LogFil"
+		BatchNam="CLAMMSnorm1"
+		funcPipeBatch RDref1
+		NextJob="Fitting CLAMMS models and discovering CNVs"
+		NextCmd="bash $COV_DIR/mosdepth/Run_CLAMMS_model_fitter.sh -i $InpFil -r $RefFil -l $LogFil"
+		NextBatch="CLAMMSfit1"
+		funcPipeBatch RDref1,CLAMMSnorm1
+		NextJob="XHMM workflow on $NoSamples samples"
+		NextCmd="bash $XHMM_OUT/Run_XHMM.sh -i $InpFil r $RefFil -l $LogFil"
+		BatchNam="XHMMcnv1"
+		funcPipeBatch RDref1
 	fi
 else
 	echo "Input has incorrect number of columns. Pipeline needs both bam files and sample IDs."

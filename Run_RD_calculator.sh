@@ -111,6 +111,7 @@ if [[ $ArrNum == $NoSamples ]]; then # Checks end job, does housekeeping
 	mv *.per-base.bed.gz.csi $COV_DIR/mosdepth
 	mv *.mosdepth.global.dist.txt $COV_DIR/mosdepth
 	mv *.mosdepth.region.dist.txt $COV_DIR/mosdepth
+	mv $COV_DIR/Run_CLAMMS_model_fitter.sh $COV_DIR/mosdepth
 	#mv *.coverage.bed ./bedtools 
 	echo "Directory mosdepth created in "$COV_DIR >> $TmpLog
 	if [[ $Pipeline == "true" ]]; then  
