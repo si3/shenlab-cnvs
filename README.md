@@ -2,7 +2,7 @@
 
 Direct questions to Stefano Iantorno (sai2116@columbia.edu, si3@github)
 
-This integrated pipeline aims to call CNVs from whole-exome sequencing (WES) data with three different read-depth based tools (CLAMMS, XHMM, CANOES) and is designed to consolidate commonalities while minimizing redundancy at each step of the workflow. The rationale behind integrating three different tools stems from the fact that each tool has specific strengths and weaknesses, and relies on different approaches to modeling read depth variation, GC, and sequence complexity. Please refer to the original publications for precision and recall of each tool, as well as benchmarking information. We attempt to provide a blueprint of a typical workflow that is customizable with minimal modification of shell scripts.
+This integrated pipeline aims to call CNVs from whole-exome sequencing (WES) data with three different read-depth based tools (CLAMMS, XHMM, CANOES) and is designed to consolidate commonalities while minimizing redundancy at each step of the workflow. The rationale behind integrating three different tools stems from the fact that each tool has specific strengths and weaknesses, and relies on different approaches to modeling read depth variation, GC, and sequence complexity. We provide a blueprint of a typical workflow that is customizable with minimal modification of shell scripts. More information on each tool is available from the respective websites.
 
 To install, type the following while in your destination path:
 
@@ -12,7 +12,7 @@ Then rename the directory to a specific project name:
 
 `mv shenlab-cnvs <name of project>`
 
-This can be done to start a new project. The pipeline is designed to run on SGE HPC (biocluster). It uses a combination of GNU parallel and qsub to parallelize processes, and therefore needs to be started on a head node. In addition to GNU parallel, XHMM, CLAMMS, mosdepth, and bedtools need to be installed and in path. For some of the preparatory and analysis steps, PICARD and PLINK/PSEQ are also required. Please refer to individual scripts for requirements of each step.
+This can be done to start a new project. The pipeline is designed to run on SGE HPC (biocluster). It uses a combination of GNU parallel and qsub to parallelize processes, and therefore needs to be started on a head node. The pipeline requires GNU parallel, XHMM, CLAMMS, mosdepth, and bedtools to be installed and in path. For some of the preparatory and analysis steps, PICARD and PLINK/PSEQ are also required. These are not part of the pipeline but they are only needed to create the windows file from the capture kit regions. Please refer to individual scripts for requirements of each step.
 
 -----------------------------------
 
@@ -66,6 +66,7 @@ At any point, you can type the following to get more information on each script:
 `bash <script> -H`
 
 The relevant usage information will be printed to screen.
+NOTE: the CANOES workflow is still ending.
 
 -----------------------------------
 
