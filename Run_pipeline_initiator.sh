@@ -85,15 +85,15 @@ if [[ $NoCol == 2 ]]; then
 	echo "Log file for bedtools/GNU parallel is RD_calculator_parallel_2.$$.log" >> $LogFil
 	echo "~~~~" >> $LogFil
 	BatchNam="RDcalc1"
-#	funcRunBatch
+	funcRunBatch
 	StepCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog RD_calculator_parallel_2.$$.log sh Run_RD_calculator_2.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
 	BatchNam="RDcalc2"
-#	funcRunBatch
+	funcRunBatch
 	if [[ $Pipeline == "true" ]]; then
 		NextJob="mosdepth and bedtools reformatter scripts"
 		NextCmd="bash $PROJ_DIR/Run_RD_reformatters.sh -i $InpFil -r $RefFil -l $LogFil -P"
 		BatchNam="RDref1"
-#		funcPipeBatch RDcalc1,RDcalc2
+		funcPipeBatch RDcalc1,RDcalc2
 		NextJob="CLAMMS workflow on $NoSamples samples"
 		NextCmd="seq 1 $NoSamples | parallel -j $NoJobs --eta --joblog CLAMMS_normalizer_parallel.$$.log sh $COV_DIR/Run_CLAMMS_normalizer.sh -i $InpFil -r $RefFil -l $LogFil -a {}"
 		#NextCmd="bash $CLAMMS_OUT/Run_CLAMMS.sh -i $InpFil -r $RefFil -l $LogFil"
@@ -104,7 +104,7 @@ if [[ $NoCol == 2 ]]; then
 		BatchNam="CLAMMSfit1"
 		funcPipeBatch RDref1,CLAMMSnorm1
 		NextJob="XHMM workflow on $NoSamples samples"
-		NextCmd="bash $XHMM_OUT/Run_XHMM.sh -i $InpFil r $RefFil -l $LogFil"
+		NextCmd="bash $XHMM_OUT/Run_XHMM.sh -i $InpFil -r $RefFil -l $LogFil"
 		BatchNam="XHMMcnv1"
 		funcPipeBatch RDref1
 	fi

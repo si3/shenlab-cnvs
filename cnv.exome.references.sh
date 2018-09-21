@@ -21,7 +21,7 @@ XHMM="/home/sai2116/bin/xhmm"
 
 # Reference files
 
-REF="/share/data/resources/hg19/references/hg19.fasta"
+REF="/home/yufengshen/resources/reference_genomes/hg19/hg19.fasta"
 PedFil="/home/sai2116/shenlab-cnvs/sample_info/WES_DHREAM.SureSelectV4.ped.txt"
 
 Min_MQ=20 # minimum mapping quality for Run_coverage_calculator.sh

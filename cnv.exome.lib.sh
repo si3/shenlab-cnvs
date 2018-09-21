@@ -67,7 +67,7 @@ else
 fi
 echo "    "$StepNam  >> $LogFil
 echo "Using qsub to submit as batch job with ID="$BatchNam >> $LogFil
-echo "#!/bin/batch" > $BatchNam.$$.sh
+echo "#!/bin/bash" > $BatchNam.$$.sh
 echo $StepCmd >> $BatchNam.$$.sh
 # checks for arguments, if present uses them as jobIDs that need completion
 if [[ -n $1 ]]; then
@@ -87,13 +87,13 @@ if [[ "$Pipeline" == "true" ]]; then
 	echo "- Call $NextJob `date`:" >> $LogFil
 	echo "	"$NextCmd >> $LogFil
 	echo "Using qsub to submit as batch job with ID="$BatchNam >> $LogFil
-	echo "#!/bin/batch" > $BatchNam.$$.sh
+	echo "#!/bin/bash" > $BatchNam.$$.sh
 	echo $NextCmd >> $BatchNam.$$.sh
 	if [[ -n $1 ]]; then
-		NextCmd="qsub -hold_jid $1 -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
+		NextCmd="qsub -V -hold_jid $1 -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -cwd $BatchNam.$$.sh"
 		eval $NextCmd
 	else
-		NextCmd="qsub -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
+		NextCmd="qsub -V -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -cwd $BatchNam.$$.sh"
 		eval $NextCmd
 	fi
 else
