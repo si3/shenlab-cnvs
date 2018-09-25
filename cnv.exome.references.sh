@@ -15,6 +15,7 @@ XHMM_OUT="/home/sai2116/shenlab-cnvs/XHMM_output"
 # Other required software, make sure it's in PATH:
 # mosdepth, bedtools, GNU parallel 
 
+export CLAMMS_DIR=/home/sai2116/bin/clamms # required to be env variable by CLAMMS
 PICARD="/share/apps/jar/picard.jar"
 CLAMMS="/home/sai2116/bin/clamms"
 XHMM="/home/sai2116/bin/xhmm"
@@ -43,14 +44,15 @@ TgtFil=$SSv4
 WindFil=$SSv4win
 
 # CLAMMS specific reference files
-minGC=""
-maxGC=""
-
 INSERT_SIZE=250
 SPEC_REG="$RES_DIR/clamms_special_regions.hg19.excluded_contigs.bed"
 MAP_REG="$RES_DIR/mappability.75mer.clamms.bed"
 
 # XHMM specific reference files, also edit params.txt file in $XHMM directory for CNV discovery specific parameters
+
+maxGC="0.1" # CLAMMS defaults to 0.3
+minGC="0.9" # CLAMMS defaults to 0.7
+
 minTargetSize=10
 maxTargetSize=10000
 minMeanTargetRD=10
@@ -86,7 +88,7 @@ lowcomp="$RES_DIR/SureSelect_All_Exon_V4_b37.low_complexity_targets.txt"
 # CANOES specific reference files
 
 # qsub specific parameters
-MaxMem="6G" # used in -l h_vmem=<size>
+MaxMem="4G" # used in -l h_vmem=<size>
 # for -pe smp <n_slots>, use $NoJobs 
 
 # USER email for notification
