@@ -91,7 +91,7 @@ if [[ $NoCol == 2 ]]; then
 	funcRunBatch
 	if [[ $Pipeline == "true" ]]; then
 		NextJob="mosdepth and bedtools reformatter scripts"
-		NextCmd="bash $PROJ_DIR/Run_RD_reformatters.sh -i $InpFil -r $RefFil -l $LogFil -P"
+		NextCmd="bash $PROJ_DIR/Run_RD_reformatters.sh -i $InpFil -r $RefFil -l $LogFil"
 		BatchNam="RDref1"
 		funcPipeBatch RDcalc1,RDcalc2
 		NextJob="CLAMMS workflow on $NoSamples samples"
