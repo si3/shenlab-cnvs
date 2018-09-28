@@ -111,7 +111,7 @@ funcRunStep
 if [[ $ArrNum == $NoSamples ]]; then # Checks end job, does housekeeping
         echo "Parallel is done" >> $TmpLog
         if [[ $Pipeline == "true" ]]; then
-                mv $CLAMMS_OUT/Run_CLAMMS_model_fitter.sh $COV_DIR/mosdepth
+                mv $COV_DIR/Run_CLAMMS_model_fitter.sh $COV_DIR/mosdepth
 		NextJob="CLAMMS workflow by fitting models based on knn reference samples and discover CNVs"
 		NextCmd="bash $COV_DIR/mosdepth/Run_CLAMMS_model_fitter.sh -i $InpFil -r $RefFil -l $LogFil"
 		BatchNam="CLAMMSfit1"
