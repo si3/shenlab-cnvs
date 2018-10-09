@@ -94,7 +94,7 @@ fi
 #StepCmd="echo $BamNam >> $PROJ_DIR/dummy.test"
 
 StepNam="Running mosdepth for "$BamNam
-StepCmd="mosdepth --by $WindFil $BamNam $BamFil -Q $Min_MQ"
+StepCmd="mosdepth --by $WindFil $BamNam $BamFil -Q $Min_MQ -f $REF"
 funcRunStep
 
 #StepNam="Running bedtools for "$BamNam
