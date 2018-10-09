@@ -66,7 +66,7 @@ At any point, you can type the following to get more information on each script:
 `bash <script> -H`
 
 The relevant usage information will be printed to screen.
-NOTE: the CANOES workflow is still ending.
+NOTE: the CANOES workflow is still pending.
 
 -----------------------------------
 
