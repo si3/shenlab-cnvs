@@ -90,7 +90,7 @@ mkdir $CLAMMS_OUT/calls
 
 cut -f2 $InpFil | while read SAMPLE; do
 	FILE=`echo "$SAMPLE".50nns.txt`
-	sort $COV_DIR/knn/$FILE > $COV_DIR/knn/$FILE.sorted
+	sort $CLAMMS_OUT/knn/$FILE > $CLAMMS_OUT/knn/$FILE.sorted
 done
 
 cd "$(dirname "$0")"
