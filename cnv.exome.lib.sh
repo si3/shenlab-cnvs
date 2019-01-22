@@ -74,7 +74,7 @@ if [[ -n $1 ]]; then
 	StepCmd="qsub -hold_jid $1 -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
 	eval $StepCmd
 else
-	StepCmd="qsub -N $BatchNam -pe smp $NoJobs -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
+	StepCmd="qsub -N $BatchNam -pe smp $NoJobs -l h_vmem=$MaxMem -V -cwd $BatchNam.$$.sh"
 	eval $StepCmd
 fi
 }
