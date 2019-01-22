@@ -12,7 +12,7 @@ Then rename the directory to a specific project name:
 
 `mv shenlab-cnvs <name of project>`
 
-This can be done to start a new project. The pipeline is designed to run on SGE HPC (biocluster). It uses a combination of GNU parallel and qsub to parallelize processes, and therefore needs to be started on a head node. The pipeline requires GNU parallel, XHMM, CLAMMS, mosdepth, and bedtools to be installed and in path. For some of the preparatory and analysis steps, PICARD and PLINK/PSEQ are also required. These are not part of the pipeline but they are only needed to create the windows file from the capture kit regions. Please refer to individual scripts for requirements of each step.
+This can be done to start a new project. The pipeline is designed to run on SGE HPC (biocluster). It uses a combination of GNU parallel and qsub to parallelize processes, and therefore needs to be started on a head node. The pipeline requires GNU parallel, XHMM, CLAMMS, mosdepth, and bedtools to be installed and in path. For some of the preparatory and analysis steps, PICARD and PLINK/PSEQ are also required. These are not part of the pipeline but they are only needed to create the windows file from the capture kit regions. The `Run_ref_prepper.sh` script performs these preparatory steps, but they can also be run manually. Please refer to individual scripts for requirements of each step.
 
 -----------------------------------
 
