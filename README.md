@@ -42,7 +42,7 @@ The general directory structure is as follows:
   - Run_XHMM.sh
   - Run_XHMM_reformatter.sh
 
-The file cnv.exome.references.sh contains all the variables called by the different scripts. Two more directories, /RES_DIR and /SAMPLE_INFO_DIR, need to be created by user in /PROJ_DIR, and the reference shell script cnv.exome.references.sh needs to be updated with the correct path for various reference files to be loaded correctly in the pipeline. The file cnv.exome.lib.sh contains functions used by several steps of the pipeline.
+The file cnv.exome.references.sh contains all the variables called by the different scripts. Two more directories, /RES_DIR and /SAMPLE_INFO_DIR, need to be created by user in /PROJ_DIR, and the reference shell script `cnv.exome.references.sh` needs to be updated with the correct path for various reference files to be loaded correctly in the pipeline. The file `cnv.exome.lib.sh` contains functions used by several steps of the pipeline.
 
 -----------------------------------
 
